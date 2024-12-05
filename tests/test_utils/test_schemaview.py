@@ -744,9 +744,6 @@ def test_ambiguous_attributes():
     a2x = SlotDefinition('a2', range='BarEnum')
     view.add_class(ClassDefinition('C2', attributes={a1x.name: a1x, a2x.name: a2x}))
 
-    assert view.get_slot(a1.name).range is None
-    assert view.get_slot(a2.name).range is None
-    assert view.get_slot(a3.name).range is not None
     assert len(view.all_slots(attributes=True)) == 3
     assert len(view.all_slots(attributes=False)) == 0
     assert len(view.all_slots()) == 3
@@ -756,6 +753,14 @@ def test_ambiguous_attributes():
     assert view.induced_slot(a1x.name, 'C2').range == a1x.range
     assert view.induced_slot(a2x.name, 'C2').range == a2x.range
 
+
+def test_ambiguous_attribute_through_get_slot():
+    schema_path = os.path.join(INPUT_DIR, "get_slot_with_ambiguous_attributes.yaml")
+    sv = SchemaView(schema_path)
+    with pytest.raises(ValueError) as exception:
+        sv.get_slot("randomAttribute")
+    assert str(exception.value) == ('Attribute "randomAttribute" is already defined in another class, please use a '
+                                    'slot in that case')
 
 def test_metamodel_in_schemaview():
     view = package_schemaview('linkml_runtime.linkml_model.meta')

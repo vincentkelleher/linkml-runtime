@@ -631,8 +631,8 @@ class SchemaView(object):
             for c in self.all_classes(imports=imports).values():
                 if slot_name in c.attributes:
                     if slot is not None:
-                        # slot name is ambiguous: return a stub slot
-                        return SlotDefinition(slot_name)
+                        raise ValueError(f'Attribute "{slot_name}" is already defined in another class, please use a '
+                                         f'slot in that case')
                     slot = copy(c.attributes[slot_name])
                     slot.from_schema = c.from_schema
                     slot.owner = c.name
